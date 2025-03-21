@@ -177,28 +177,28 @@ function Main() {
 
             {/* Métricas de sensores */}
             <div className="grid grid-cols-2 gap-6 w-auto h-fit">
-                <div className="flex flex-col justify-center items-center bg-white w-[200px] h-[120px] rounded-md shadow-md text-1xl">
+                <div className="flex flex-col justify-center items-center bg-white w-[400px] h-[220px] rounded-md shadow-md text-1xl">
                     <div className="flex">
                         <h1 className="font-bold">Temperatura</h1>
                         <DeviceThermostatIcon sx={{ fontSize: 25 }} />
                     </div>
                     <p className="text-gray-700">{sensores.temperatura}°C</p>
                 </div>
-                <div className="flex flex-col justify-center items-center bg-white w-[200px] h-[120px] rounded-md shadow-md text-1xl">
+                <div className="flex flex-col justify-center items-center bg-white w-[400px] h-[220px] rounded-md shadow-md text-1xl">
                     <div className="flex gap-2">
                         <h1 className="font-bold">Humedad</h1>
                         <WaterDropIcon />
                     </div>
                     <p className="text-gray-700">{sensores.humedad}%</p>
                 </div>
-                <div className="flex flex-col justify-center items-center bg-white w-[200px] h-[120px] rounded-md shadow-md text-1xl">
+                <div className="flex flex-col justify-center items-center bg-white w-[400px] h-[220px] rounded-md shadow-md text-1xl">
                     <div className="flex gap-2">
                         <h1 className="font-bold">Clima</h1>
                         <CloudIcon />
                     </div>
                     <p className="text-gray-700">{sensores.lluvia === 0 ? "Soleado" : "Lluvia"}</p>
                 </div>
-                <div className="flex flex-col justify-center items-center bg-white w-[200px] h-[120px] rounded-md shadow-md text-1xl">
+                <div className="flex flex-col justify-center items-center bg-white w-[400px] h-[220px] rounded-md shadow-md text-1xl">
                     <div className="flex gap-2">
                         <h1 className="font-bold">Intensidad del sol</h1>
                         <WarningAmberIcon />
