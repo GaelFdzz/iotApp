@@ -2,17 +2,21 @@ import { supabase } from "../data/supabaseConfig";
 import axios from "axios";
 
 export async function guardarDatosAPI() {
+    console.log("🚀 Ejecutando guardarDatosAPI");
+
     try {
-        // Obtener datos de la API externa
-        const response = await axios.get("http://moriahmkt.com/iotapp/");
+        // 1. Obtener datos de la API externa
+        const response = await axios.get("api/test/");
         const data = response.data;
 
-        if (!data) {
-            console.warn("No se recibieron datos de la API.");
+        console.log("📡 Data recibida de la API:", data);
+
+        if (!data || !data.sensores || !data.parcelas) {
+            console.warn("⚠️ Datos incompletos de la API.");
             return;
         }
 
-        // 📌 1️⃣ Guardar sensores globales si cambian
+        // 2. Guardar sensores globales si cambian
         const { data: lastSensorGlobal, error: errorGlobal } = await supabase
             .from("sensores_globales")
             .select("*")
@@ -20,8 +24,10 @@ export async function guardarDatosAPI() {
             .limit(1)
             .single();
 
+        console.log("🌡 Último sensor global:", lastSensorGlobal);
+
         if (errorGlobal) {
-            console.error("Error al obtener sensores globales:", errorGlobal);
+            console.error("❌ Error al obtener sensores globales:", errorGlobal);
             return;
         }
 
@@ -37,39 +43,46 @@ export async function guardarDatosAPI() {
                 humedad: data.sensores.humedad,
                 lluvia: data.sensores.lluvia,
                 sol: data.sensores.sol,
+                fecha_registro: new Date(),
             }]);
 
             if (insertError) {
-                console.error("Error al insertar sensores globales:", insertError);
+                console.error("❌ Error al insertar sensores globales:", insertError);
                 return;
+            } else {
+                console.log("✅ Sensores globales insertados.");
             }
         }
 
-        // 📌 2️⃣ Guardar parcelas y verificar si alguna ha sido eliminada
+        // 3. Verificar y actualizar parcelas inactivas
         const { data: parcelasDB, error: errorParcelasDB } = await supabase.from("parcelas").select("id");
 
         if (errorParcelasDB) {
-            console.error("Error al obtener parcelas de la base de datos:", errorParcelasDB);
+            console.error("❌ Error al obtener parcelas de BD:", errorParcelasDB);
             return;
         }
 
         const parcelasEnAPI = data.parcelas.map((p: any) => p.id);
         const parcelasEnBD = parcelasDB ? parcelasDB.map((p: any) => p.id) : [];
 
-        // Marcar como eliminadas las que ya no están en la API
         for (const parcelaId of parcelasEnBD) {
             if (!parcelasEnAPI.includes(parcelaId)) {
-                const { error: updateError } = await supabase.from("parcelas").update({ activa: false }).eq("id", parcelaId);
+                const { error: updateError } = await supabase
+                    .from("parcelas")
+                    .update({ activa: false })
+                    .eq("id", parcelaId);
+
                 if (updateError) {
-                    console.error(`Error al desactivar parcela con id ${parcelaId}:`, updateError);
+                    console.error(`❌ Error al desactivar parcela con id ${parcelaId}:`, updateError);
+                } else {
+                    console.log(`🟡 Parcela desactivada: ${parcelaId}`);
                 }
             }
         }
 
-        // 📌 3️⃣ Insertar/Actualizar datos de parcelas y sensores de parcelas
+        // 4. Insertar o actualizar parcelas y sensores
         for (const parcela of data.parcelas) {
-
-            // Verifica si los datos de sensores están completos
+            // Validar sensores
             if (
                 parcela.sensor &&
                 parcela.sensor.temperatura !== undefined &&
@@ -77,8 +90,7 @@ export async function guardarDatosAPI() {
                 parcela.sensor.lluvia !== undefined &&
                 parcela.sensor.sol !== undefined
             ) {
-
-                // Insertar o actualizar la parcela
+                // Insertar o actualizar parcela
                 const { error: upsertError } = await supabase.from("parcelas").upsert([{
                     id: parcela.id,
                     nombre: parcela.nombre,
@@ -92,29 +104,33 @@ export async function guardarDatosAPI() {
                 }]);
 
                 if (upsertError) {
-                    console.error(`Error al insertar o actualizar la parcela con id ${parcela.id}:`, upsertError);
-                    continue; // Continúa con las siguientes parcelas si ocurre un error
+                    console.error(`❌ Error al insertar/actualizar parcela ${parcela.id}:`, upsertError);
+                    continue;
+                } else {
+                    console.log(`✅ Parcela guardada: ${parcela.nombre} (${parcela.id})`);
                 }
 
-                // Insertar datos de sensores de la parcela
+                // Insertar sensores de la parcela
                 const { error: insertSensorError } = await supabase.from("sensores_parcelas").insert([{
                     parcela_id: parcela.id,
                     temperatura: parcela.sensor.temperatura,
                     humedad: parcela.sensor.humedad,
                     lluvia: parcela.sensor.lluvia,
                     sol: parcela.sensor.sol,
-                    fecha_registro: new Date(), // Asegúrate de incluir la fecha
+                    fecha_registro: new Date(),
                 }]);
 
                 if (insertSensorError) {
-                    console.error(`Error al insertar sensores de la parcela con id ${parcela.id}:`, insertSensorError);
+                    console.error(`❌ Error al insertar sensores de parcela ${parcela.id}:`, insertSensorError);
                 } else {
+                    console.log(`📊 Sensores guardados para parcela ${parcela.id}`);
                 }
             } else {
-                console.warn(`Datos de sensores incompletos para la parcela con id ${parcela.id}.`);
+                console.warn(`⚠️ Datos de sensores incompletos para parcela ${parcela.id}`);
             }
         }
+
     } catch (error) {
-        console.error("Error general al guardar datos en la API o base de datos:", error);
+        console.error("🔥 Error general en guardarDatosAPI:", error);
     }
 }

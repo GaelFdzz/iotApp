@@ -5,15 +5,16 @@ import CloudIcon from "@mui/icons-material/Cloud";
 import WaterDropIcon from "@mui/icons-material/WaterDrop";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import axios from "axios";
-import { obtenerHistoricoSensores } from "../data/ObtenerHistoricoSensores"; // Importa la función de obtener histórico
-import { Line, Bar, Doughnut } from "react-chartjs-2"; // Cambiar de Radar a Doughnut
+import { obtenerHistoricoSensores } from "../data/ObtenerHistoricoSensores";
+import { Line, Bar, Doughnut } from "react-chartjs-2";
 import { Chart as ChartJS, CategoryScale, LinearScale, RadialLinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend } from "chart.js";
+import { guardarDatosAPI } from "../data/GuardarDatosAPI";
 
 // Registrar los componentes necesarios para los gráficos
 ChartJS.register(
     CategoryScale,
     LinearScale,
-    RadialLinearScale, // Registrar la escala radialLinear para gráficos de radar
+    RadialLinearScale,
     PointElement,
     LineElement,
     BarElement,
@@ -33,76 +34,87 @@ function Main() {
 
     // Define los tipos de datos para el histórico
     const [historico, setHistorico] = useState({
-        temperaturas: [] as number[], // Aseguramos que sea un arreglo de números
+        temperaturas: [] as number[],
         humedades: [] as number[],
         lluvias: [] as number[],
         sol: [] as number[],
-        timestamps: [] as string[], // Array de cadenas (timestamps)
+        timestamps: [] as string[],
     });
 
     useEffect(() => {
         async function fetchData() {
-            // Obtener el histórico de los sensores desde Supabase
-            const historicoData = await obtenerHistoricoSensores();
-    
-            // Si obtenemos datos históricos, los agregamos al estado
-            if (historicoData.length > 0) {
-                const temperaturas: number[] = [];
-                const humedades: number[] = [];
-                const lluvias: number[] = [];
-                const sol: number[] = [];
-                const timestamps: string[] = [];
-    
-                historicoData.forEach((registro: any) => {
-                    temperaturas.push(registro.temperatura);
-                    humedades.push(registro.humedad);
-                    lluvias.push(registro.lluvia);
-                    sol.push(registro.sol);
-    
-                    // Formatear la fecha para que solo muestre el día (día/mes/año)
-                    const fecha = new Date(registro.fecha_registro);
-                    const fechaFormateada = `${fecha.getDate()}/${fecha.getMonth() + 1}/${fecha.getFullYear()}`;
-                    timestamps.push(fechaFormateada);
-                });
-    
-                setHistorico({
-                    temperaturas,
-                    humedades,
-                    lluvias,
-                    sol,
-                    timestamps,
-                });
-            }
-    
-            // Obtener los datos actuales de los sensores
-            const { data } = await axios.get("http://moriahmkt.com/iotapp/");
-            if (data) {
-                setSensores(data.sensores);
-                // Agregar los nuevos valores de los sensores al histórico
-                setHistorico((prev) => {
-                    const fechaActual = new Date();
-                    const fechaFormateada = `${fechaActual.getDate()}/${fechaActual.getMonth() + 1}/${fechaActual.getFullYear()}`;
-    
-                    return {
-                        ...prev,
-                        temperaturas: [...prev.temperaturas, data.sensores.temperatura],
-                        humedades: [...prev.humedades, data.sensores.humedad],
-                        lluvias: [...prev.lluvias, data.sensores.lluvia],
-                        sol: [...prev.sol, data.sensores.sol],
-                        timestamps: [...prev.timestamps, fechaFormateada],
-                    };
-                });
+            console.log("⏳ Ejecutando fetchData...");
+            try {
+                // Obtener histórico de sensores
+                const historicoData = await obtenerHistoricoSensores();
+                console.log("📊 Histórico de sensores recibido:", historicoData);
+
+                if (historicoData.length > 0) {
+                    const temperaturas: number[] = [];
+                    const humedades: number[] = [];
+                    const lluvias: number[] = [];
+                    const sol: number[] = [];
+                    const timestamps: string[] = [];
+
+                    historicoData.forEach((registro: any) => {
+                        temperaturas.push(registro.temperatura);
+                        humedades.push(registro.humedad);
+                        lluvias.push(registro.lluvia);
+                        sol.push(registro.sol);
+
+                        const fecha = new Date(registro.fecha_registro);
+                        const fechaFormateada = `${fecha.getDate()}/${fecha.getMonth() + 1}/${fecha.getFullYear()}`;
+                        timestamps.push(fechaFormateada);
+                    });
+
+                    setHistorico({
+                        temperaturas,
+                        humedades,
+                        lluvias,
+                        sol,
+                        timestamps,
+                    });
+                }
+
+                // Obtener datos de la API
+                const { data } = await axios.get("api/test/");
+                console.log("📡 Datos de la API recibidos:", data);
+
+                if (data) {
+                    setSensores(data.sensores);
+                    console.log("🌡 Sensores actualizados:", data.sensores);
+
+                    setHistorico((prev) => {
+                        const fechaActual = new Date();
+                        const fechaFormateada = `${fechaActual.getDate()}/${fechaActual.getMonth() + 1}/${fechaActual.getFullYear()}`;
+
+                        return {
+                            ...prev,
+                            temperaturas: [...prev.temperaturas, data.sensores.temperatura],
+                            humedades: [...prev.humedades, data.sensores.humedad],
+                            lluvias: [...prev.lluvias, data.sensores.lluvia],
+                            sol: [...prev.sol, data.sensores.sol],
+                            timestamps: [...prev.timestamps, fechaFormateada],
+                        };
+                    });
+                } else {
+                    console.warn("⚠️ No se recibieron datos válidos de la API.");
+                }
+            } catch (error) {
+                console.error("❌ Error en fetchData:", error);
             }
         }
-    
+
         fetchData();
-        const interval = setInterval(fetchData, 60000); // Actualiza cada 60 segundos
-    
+        const interval = setInterval(fetchData, 60000);
+
+        guardarDatosAPI()
+
         return () => clearInterval(interval);
     }, []);
-    
 
-    // Configuración de gráficos
+
+
     const lineChartData = {
         labels: historico.timestamps,
         datasets: [
