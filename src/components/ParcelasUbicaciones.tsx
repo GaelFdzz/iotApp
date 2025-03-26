@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react"
 import mapboxgl, { Marker } from "mapbox-gl"
 import "mapbox-gl/dist/mapbox-gl.css"
 import { obtenerParcelas } from "../data/ObtenerParcelas"
+import CircularProgress from "@mui/material/CircularProgress"
 
 // Interfaces
 interface Sensor {
@@ -32,16 +33,24 @@ function ParcelasUbicaciones() {
     const mapRef = useRef<mapboxgl.Map | null>(null)
     const [parcelasActivas, setParcelasActivas] = useState<Parcela[]>([])
     const [parcelasInactivas, setParcelasInactivas] = useState<Parcela[]>([])
+    const [loading, setLoading] = useState(true)
 
     // Obtener parcelas
     useEffect(() => {
         async function fetchParcelas() {
-            const data = await obtenerParcelas()
-            if (data) {
-                const activas = data.filter((p: Parcela) => p.activa)
-                const inactivas = data.filter((p: Parcela) => !p.activa)
-                setParcelasActivas(activas)
-                setParcelasInactivas(inactivas)
+            setLoading(true)
+            try {
+                const data = await obtenerParcelas()
+                if (data) {
+                    const activas = data.filter((p: Parcela) => p.activa)
+                    const inactivas = data.filter((p: Parcela) => !p.activa)
+                    setParcelasActivas(activas)
+                    setParcelasInactivas(inactivas)
+                }
+            } catch (error) {
+                console.error("Error al obtener parcelas:", error)
+            } finally {
+                setLoading(false)
             }
         }
 
@@ -106,8 +115,47 @@ function ParcelasUbicaciones() {
         }
     }, [])
 
+    if (loading) {
+        return (
+            <div className="flex mt-50 justify-center items-center text-white">
+                <CircularProgress size={80} color="inherit" />
+                <p className="ml-4 text-xl">Cargando datos de sensores...</p>
+            </div>
+        )
+    }
+
     return (
-        <div className="p-4">
+        <div className="">
+            {/* Parcelas eliminadas */}
+            {parcelasInactivas.length > 0 && (
+                <div className="">
+                    <h2 className="text-3xl font-bold mb-4 text-white">Parcelas eliminadas ❌</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {parcelasInactivas.map((parcela) => (
+                            <div key={parcela.id} className="p-4 bg-gray-100 rounded-md shadow-inner">
+                                <h2 className="text-xl font-semibold">{parcela.nombre}</h2>
+                                <p><strong>Responsable:</strong> {parcela.responsable}</p>
+                                <p><strong>Ubicación:</strong> {parcela.ubicacion}</p>
+                                <p><strong>Tipo de cultivo:</strong> {parcela.tipo_cultivo}</p>
+                                <p><strong>Último riego:</strong> {parcela.ultimo_riego}</p>
+                                {parcela.sensores.length > 0 ? (
+                                    parcela.sensores.map((sensor, index) => (
+                                        <div key={index}>
+                                            <p><strong>Humedad:</strong> {sensor.humedad}%</p>
+                                            <p><strong>Temperatura:</strong> {sensor.temperatura}°C</p>
+                                            {<p><strong>Lluvia:</strong> {sensor.lluvia} mm</p>}
+                                            {<p><strong>Sol:</strong> {sensor.sol}%</p>}
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p><strong>Sin sensores disponibles.</strong></p>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
             {/* Título */}
             <h1 className="text-3xl text-white font-bold mb-4">Parcelas activas 🗺</h1>
 
@@ -125,8 +173,8 @@ function ParcelasUbicaciones() {
                                 <div key={index}>
                                     <p><strong>Humedad:</strong> {sensor.humedad}%</p>
                                     <p><strong>Temperatura:</strong> {sensor.temperatura}°C</p>
-                                    {sensor.lluvia && <p><strong>Lluvia:</strong> {sensor.lluvia}</p>}
-                                    {sensor.sol && <p><strong>Sol:</strong> {sensor.sol}</p>}
+                                    {<p><strong>Lluvia:</strong> {sensor.lluvia} mm</p>}
+                                    {<p><strong>Sol:</strong> {sensor.sol}%</p>}
                                 </div>
                             ))
                         ) : (
@@ -138,36 +186,6 @@ function ParcelasUbicaciones() {
 
             {/* Mapa */}
             <div ref={mapContainerRef} className="w-full h-[250px] mt-6 rounded-md shadow-sm" />
-
-            {/* Parcelas eliminadas */}
-            {parcelasInactivas.length > 0 && (
-                <div className="mt-10">
-                    <h2 className="text-3xl font-bold mb-4 text-white">Parcelas eliminadas 🗺</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {parcelasInactivas.map((parcela) => (
-                            <div key={parcela.id} className="p-4 bg-gray-100 rounded-md shadow-inner">
-                                <h2 className="text-xl font-semibold">{parcela.nombre}</h2>
-                                <p><strong>Responsable:</strong> {parcela.responsable}</p>
-                                <p><strong>Ubicación:</strong> {parcela.ubicacion}</p>
-                                <p><strong>Tipo de cultivo:</strong> {parcela.tipo_cultivo}</p>
-                                <p><strong>Último riego:</strong> {parcela.ultimo_riego}</p>
-                                {parcela.sensores.length > 0 ? (
-                                    parcela.sensores.map((sensor, index) => (
-                                        <div key={index}>
-                                            <p><strong>Humedad:</strong> {sensor.humedad}%</p>
-                                            <p><strong>Temperatura:</strong> {sensor.temperatura}°C</p>
-                                            {sensor.lluvia && <p><strong>Lluvia:</strong> {sensor.lluvia}</p>}
-                                            {sensor.sol && <p><strong>Sol:</strong> {sensor.sol}</p>}
-                                        </div>
-                                    ))
-                                ) : (
-                                    <p><strong>Sin sensores disponibles.</strong></p>
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            )}
         </div>
     )
 }

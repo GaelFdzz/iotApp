@@ -14,7 +14,7 @@ export default function Login() {
     }
 
     return (
-        <div className="bg-indigo-700 min-h-screen flex items-center justify-center bg-cover bg-center bg-no-repeat" style={{backgroundImage: "url('../../public/campo.jpg')"}}>
+        <div className="bg-indigo-700 min-h-screen flex items-center justify-center bg-cover bg-center bg-no-repeat" style={{backgroundImage: "url('/campoLogin.jpg')"}}>
             <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded shadow">
                 <h1 className="flex justify-center text-3xl font-bold mb-4">Iniciar sesión</h1>
                 <p className="text-2xl mb-1">Bienvenido! 🌳</p>
@@ -44,9 +44,12 @@ export default function Login() {
 
                     <p className="flex justify-center">--------- ó -----------</p>
 
-                    <Link to="/register" className="inline-block">
-                        <p className="flex justify-center text-blue-700 underline">Registrarse</p>
-                    </Link>
+                    <span className="flex gap-1">
+                        <p>¿No tienes una cuenta? </p>
+                        <Link to="/register" className="text-blue-500 underline">
+                            Registrate
+                        </Link>
+                    </span>
                 </div>
 
                 {error && <p className="flex justify-center text-red-500 mt-2">{error}</p>}

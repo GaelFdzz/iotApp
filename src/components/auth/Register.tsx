@@ -15,10 +15,11 @@ export default function Register() {
     }
 
     return (
-        <div className="bg-indigo-700 min-h-screen flex items-center justify-center bg-cover bg-center bg-no-repeat" style={{backgroundImage: "url('../../public/campo.jpg')"}}>
+        <div className="bg-indigo-700 min-h-screen flex items-center justify-center bg-cover bg-center bg-no-repeat" style={{ backgroundImage: "url('/campoRegister.jpg')" }}>
 
             <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded shadow">
-                <h2 className="text-xl font-bold mb-4">Registro</h2>
+                <h2 className="flex justify-center text-3xl font-bold mb-4">Registro de usuarios nuevos</h2>
+                <label>Correo electronico</label>
                 <input
                     className="w-full mb-2 p-2 border rounded"
                     type="email"
@@ -26,6 +27,7 @@ export default function Register() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                 />
+                <label>Contraseña</label>
                 <input
                     className="w-full mb-4 p-2 border rounded"
                     type="password"

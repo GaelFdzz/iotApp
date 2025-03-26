@@ -9,6 +9,7 @@ import { obtenerHistoricoSensores } from "../data/ObtenerHistoricoSensores"
 import { Line, Bar, Doughnut } from "react-chartjs-2"
 import { Chart as ChartJS, CategoryScale, LinearScale, RadialLinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend } from "chart.js"
 import { guardarDatosAPI } from "../data/GuardarDatosAPI"
+import CircularProgress from "@mui/material/CircularProgress"
 
 // Registrar los componentes necesarios para los gráficos
 ChartJS.register(
@@ -25,6 +26,7 @@ ChartJS.register(
 )
 
 function Main() {
+    const [loading, setLoading] = useState(true)
     const [sensores, setSensores] = useState({
         temperatura: 0,
         humedad: 0,
@@ -44,6 +46,8 @@ function Main() {
     useEffect(() => {
         async function fetchData() {
             console.log("⏳ Ejecutando fetchData...")
+            setLoading(true)
+            // await new Promise((resolve) => setTimeout(resolve, 2000)) // Espera 2 segundos
             try {
                 // Obtener histórico de sensores
                 const historicoData = await obtenerHistoricoSensores()
@@ -102,6 +106,8 @@ function Main() {
                 }
             } catch (error) {
                 console.error("❌ Error en fetchData:", error)
+            } finally {
+                setLoading(false)
             }
         }
 
@@ -112,8 +118,6 @@ function Main() {
 
         return () => clearInterval(interval)
     }, [])
-
-
 
     const lineChartData = {
         labels: historico.timestamps,
@@ -151,16 +155,28 @@ function Main() {
         ],
     }
 
+    // Calcular el promedio de cada sensor
+    const calcularPromedio = (arr: number[]) => {
+        if (arr.length === 0) return 0
+        const suma = arr.reduce((acc, val) => acc + val, 0)
+        return parseFloat((suma / arr.length).toFixed(2))
+    }
+
+    const promedioTemperatura = calcularPromedio(historico.temperaturas)
+    const promedioHumedad = calcularPromedio(historico.humedades)
+    const promedioLluvia = calcularPromedio(historico.lluvias)
+    const promedioSol = calcularPromedio(historico.sol)
+
     const doughnutChartData = {
         labels: ["Temperatura", "Humedad", "Lluvia", "Sol"],
         datasets: [
             {
-                label: "Sensor",
+                label: "Promedio histórico",
                 data: [
-                    sensores.temperatura,
-                    sensores.humedad,
-                    sensores.lluvia,
-                    sensores.sol,
+                    promedioTemperatura,
+                    promedioHumedad,
+                    promedioLluvia,
+                    promedioSol,
                 ],
                 backgroundColor: [
                     "rgba(255, 99, 132, 0.2)",
@@ -179,38 +195,47 @@ function Main() {
         ],
     }
 
+    if (loading) {
+        return (
+            <div className="flex mt-50 justify-center items-center text-white">
+                <CircularProgress size={80} color="inherit" />
+                <p className="ml-4 text-xl">Cargando datos de sensores...</p>
+            </div>
+        )
+    }
+
     return (
         <div className="h-full flex flex-wrap gap-10">
             {/* Mapa de Mapbox */}
             <div className="w-[500px] h-full flex flex-col bg-white p-4 rounded-md overflow-hidden">
-                <h1 className="text-2xl font-bold">Mapa de ubicaciones 📍</h1>
+                <h1 className="text-2xl font-bold mb-2">Mapa de ubicaciones de las parcelas 📍</h1>
                 <MapBox />
             </div>
 
             {/* Métricas de sensores */}
             <div className="grid grid-cols-2 gap-6 w-auto h-fit">
-                <div className="flex flex-col justify-center items-center bg-white w-[200px] h-[120px] rounded-md shadow-md text-1xl">
+                <div className="flex flex-col justify-center items-center bg-white w-[300px] h-[120px] rounded-md shadow-md text-1xl">
                     <div className="flex">
                         <h1 className="font-bold">Temperatura</h1>
                         <DeviceThermostatIcon sx={{ fontSize: 25 }} />
                     </div>
                     <p className="text-gray-700">{sensores.temperatura}°C</p>
                 </div>
-                <div className="flex flex-col justify-center items-center bg-white w-[200px] h-[120px] rounded-md shadow-md text-1xl">
+                <div className="flex flex-col justify-center items-center bg-white w-[300px] h-[120px] rounded-md shadow-md text-1xl">
                     <div className="flex gap-2">
                         <h1 className="font-bold">Humedad</h1>
                         <WaterDropIcon />
                     </div>
                     <p className="text-gray-700">{sensores.humedad}%</p>
                 </div>
-                <div className="flex flex-col justify-center items-center bg-white w-[200px] h-[120px] rounded-md shadow-md text-1xl">
+                <div className="flex flex-col justify-center items-center bg-white w-[300px] h-[120px] rounded-md shadow-md text-1xl">
                     <div className="flex gap-2">
                         <h1 className="font-bold">Clima</h1>
                         <CloudIcon />
                     </div>
                     <p className="text-gray-700">{sensores.lluvia === 0 ? "Soleado" : "Lluvia"}</p>
                 </div>
-                <div className="flex flex-col justify-center items-center bg-white w-[200px] h-[120px] rounded-md shadow-md text-1xl">
+                <div className="flex flex-col justify-center items-center bg-white w-[300px] h-[120px] rounded-md shadow-md text-1xl">
                     <div className="flex gap-2">
                         <h1 className="font-bold">Intensidad del sol</h1>
                         <WarningAmberIcon />
@@ -220,18 +245,25 @@ function Main() {
             </div>
 
             {/* Gráficos */}
+            <div className="flex flex-col">
+                <h1 className="text-3xl font-bold text-white">Gráficos historicos de los terrenos</h1>
+                <p className="text-white">Historico de los ultimos 50 registros de los sensores</p>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full justify-between">
                 <div className="bg-white p-4 rounded-md shadow-md col-span-1 md:col-span-1">
-                    <h2 className="text-xl font-semibold mb-4">Gráfico de Temperatura y Humedad</h2>
+                    <h2 className="flex text-xl font-semibold mb-4 justify-center">Temperatura y Humedad</h2>
                     <Line data={lineChartData} height={400} />
                 </div>
                 <div className="bg-white p-4 rounded-md shadow-md col-span-1 md:col-span-1">
-                    <h2 className="text-xl font-semibold mb-4">Gráfico de Lluvia y Sol</h2>
+                    <h2 className="flex text-xl font-semibold mb-4 justify-center">Lluvia y Sol</h2>
                     <Bar data={barChartData} height={400} />
                 </div>
                 <div className="bg-white p-4 rounded-md shadow-md col-span-1 md:col-span-1">
-                    <h2 className="text-xl font-semibold mb-4">Gráfico Dona</h2>
-                    <Doughnut data={doughnutChartData} height={400} />
+                    <div>
+                        <h2 className="flex text-xl font-semibold mb-4 justify-center">Todos los sensores</h2>
+                        <Doughnut data={doughnutChartData} height={400} />
+                        <p className="mt-30 text-gray-400">Promedio de los registros de cada sensor</p>
+                    </div>
                 </div>
             </div>
         </div>
