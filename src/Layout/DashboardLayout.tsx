@@ -1,14 +1,14 @@
-import { Outlet } from "react-router-dom";
-import Footer from "./Footer";
-import Header from "./Header";
-import Sidebar from "./Sidebar";
+import { Outlet } from "react-router-dom"
+import Footer from "./Footer"
+import Header from "./Header"
+import Sidebar from "./Sidebar"
 
 function DashboardLayout() {
     return (
         <>
             <div className="w-screen h-screen">
                 <div
-                    className="grid grid-cols-5 gap-4 bg-blue-400/50 w-full h-full"
+                    className="grid grid-cols-5 gap-4 bg-indigo-600 w-full h-full"
                     style={{ gridTemplateRows: "auto 1fr 1fr 1fr auto" }}
                 >
                     <div className="col-span-5 p-4 flex bg-white">
@@ -29,7 +29,7 @@ function DashboardLayout() {
                 </div>
             </div>
         </>
-    );
+    )
 }
 
-export default DashboardLayout;
+export default DashboardLayout

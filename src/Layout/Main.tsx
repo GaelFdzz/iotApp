@@ -1,14 +1,14 @@
-import { useEffect, useState } from "react";
-import MapBox from "../components/MapBox";
-import DeviceThermostatIcon from "@mui/icons-material/DeviceThermostat";
-import CloudIcon from "@mui/icons-material/Cloud";
-import WaterDropIcon from "@mui/icons-material/WaterDrop";
-import WarningAmberIcon from "@mui/icons-material/WarningAmber";
-import axios from "axios";
-import { obtenerHistoricoSensores } from "../data/ObtenerHistoricoSensores";
-import { Line, Bar, Doughnut } from "react-chartjs-2";
-import { Chart as ChartJS, CategoryScale, LinearScale, RadialLinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend } from "chart.js";
-import { guardarDatosAPI } from "../data/GuardarDatosAPI";
+import { useEffect, useState } from "react"
+import MapBox from "../components/MapBox"
+import DeviceThermostatIcon from "@mui/icons-material/DeviceThermostat"
+import CloudIcon from "@mui/icons-material/Cloud"
+import WaterDropIcon from "@mui/icons-material/WaterDrop"
+import WarningAmberIcon from "@mui/icons-material/WarningAmber"
+import axios from "axios"
+import { obtenerHistoricoSensores } from "../data/ObtenerHistoricoSensores"
+import { Line, Bar, Doughnut } from "react-chartjs-2"
+import { Chart as ChartJS, CategoryScale, LinearScale, RadialLinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend } from "chart.js"
+import { guardarDatosAPI } from "../data/GuardarDatosAPI"
 
 // Registrar los componentes necesarios para los gráficos
 ChartJS.register(
@@ -22,7 +22,7 @@ ChartJS.register(
     Title,
     Tooltip,
     Legend
-);
+)
 
 function Main() {
     const [sensores, setSensores] = useState({
@@ -30,7 +30,7 @@ function Main() {
         humedad: 0,
         lluvia: 0,
         sol: 0,
-    });
+    })
 
     // Define los tipos de datos para el histórico
     const [historico, setHistorico] = useState({
@@ -39,33 +39,33 @@ function Main() {
         lluvias: [] as number[],
         sol: [] as number[],
         timestamps: [] as string[],
-    });
+    })
 
     useEffect(() => {
         async function fetchData() {
-            console.log("⏳ Ejecutando fetchData...");
+            console.log("⏳ Ejecutando fetchData...")
             try {
                 // Obtener histórico de sensores
-                const historicoData = await obtenerHistoricoSensores();
-                console.log("📊 Histórico de sensores recibido:", historicoData);
+                const historicoData = await obtenerHistoricoSensores()
+                console.log("📊 Histórico de sensores recibido:", historicoData)
 
                 if (historicoData.length > 0) {
-                    const temperaturas: number[] = [];
-                    const humedades: number[] = [];
-                    const lluvias: number[] = [];
-                    const sol: number[] = [];
-                    const timestamps: string[] = [];
+                    const temperaturas: number[] = []
+                    const humedades: number[] = []
+                    const lluvias: number[] = []
+                    const sol: number[] = []
+                    const timestamps: string[] = []
 
                     historicoData.forEach((registro: any) => {
-                        temperaturas.push(registro.temperatura);
-                        humedades.push(registro.humedad);
-                        lluvias.push(registro.lluvia);
-                        sol.push(registro.sol);
+                        temperaturas.push(registro.temperatura)
+                        humedades.push(registro.humedad)
+                        lluvias.push(registro.lluvia)
+                        sol.push(registro.sol)
 
-                        const fecha = new Date(registro.fecha_registro);
-                        const fechaFormateada = `${fecha.getDate()}/${fecha.getMonth() + 1}/${fecha.getFullYear()}`;
-                        timestamps.push(fechaFormateada);
-                    });
+                        const fecha = new Date(registro.fecha_registro)
+                        const fechaFormateada = `${fecha.getDate()}/${fecha.getMonth() + 1}/${fecha.getFullYear()}`
+                        timestamps.push(fechaFormateada)
+                    })
 
                     setHistorico({
                         temperaturas,
@@ -73,20 +73,20 @@ function Main() {
                         lluvias,
                         sol,
                         timestamps,
-                    });
+                    })
                 }
 
                 // Obtener datos de la API
-                const { data } = await axios.get("api/test/");
-                console.log("📡 Datos de la API recibidos:", data);
+                const { data } = await axios.get("api/updated/")
+                console.log("📡 Datos de la API recibidos:", data)
 
                 if (data) {
-                    setSensores(data.sensores);
-                    console.log("🌡 Sensores actualizados:", data.sensores);
+                    setSensores(data.sensores)
+                    console.log("🌡 Sensores actualizados:", data.sensores)
 
                     setHistorico((prev) => {
-                        const fechaActual = new Date();
-                        const fechaFormateada = `${fechaActual.getDate()}/${fechaActual.getMonth() + 1}/${fechaActual.getFullYear()}`;
+                        const fechaActual = new Date()
+                        const fechaFormateada = `${fechaActual.getDate()}/${fechaActual.getMonth() + 1}/${fechaActual.getFullYear()}`
 
                         return {
                             ...prev,
@@ -95,23 +95,23 @@ function Main() {
                             lluvias: [...prev.lluvias, data.sensores.lluvia],
                             sol: [...prev.sol, data.sensores.sol],
                             timestamps: [...prev.timestamps, fechaFormateada],
-                        };
-                    });
+                        }
+                    })
                 } else {
-                    console.warn("⚠️ No se recibieron datos válidos de la API.");
+                    console.warn("⚠️ No se recibieron datos válidos de la API.")
                 }
             } catch (error) {
-                console.error("❌ Error en fetchData:", error);
+                console.error("❌ Error en fetchData:", error)
             }
         }
 
-        fetchData();
-        const interval = setInterval(fetchData, 60000);
+        fetchData()
+        const interval = setInterval(fetchData, 60000)
 
         guardarDatosAPI()
 
-        return () => clearInterval(interval);
-    }, []);
+        return () => clearInterval(interval)
+    }, [])
 
 
 
@@ -133,7 +133,7 @@ function Main() {
                 fill: true,
             },
         ],
-    };
+    }
 
     const barChartData = {
         labels: historico.timestamps,
@@ -149,7 +149,7 @@ function Main() {
                 backgroundColor: "#FFD700",
             },
         ],
-    };
+    }
 
     const doughnutChartData = {
         labels: ["Temperatura", "Humedad", "Lluvia", "Sol"],
@@ -177,13 +177,13 @@ function Main() {
                 borderWidth: 1,
             },
         ],
-    };
+    }
 
     return (
         <div className="h-full flex flex-wrap gap-10">
             {/* Mapa de Mapbox */}
             <div className="w-[500px] h-full flex flex-col bg-white p-4 rounded-md overflow-hidden">
-                <h1 className="text-2xl font-bold">Mapa de ubicaciones</h1>
+                <h1 className="text-2xl font-bold">Mapa de ubicaciones 📍</h1>
                 <MapBox />
             </div>
 
@@ -235,7 +235,7 @@ function Main() {
                 </div>
             </div>
         </div>
-    );
+    )
 }
 
-export default Main;
+export default Main

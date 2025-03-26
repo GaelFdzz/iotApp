@@ -1,59 +1,58 @@
-import { useEffect, useRef, useState } from "react";
-import mapboxgl, { Marker } from "mapbox-gl";
-import "mapbox-gl/dist/mapbox-gl.css";
-import { obtenerParcelas } from "../data/ObtenerParcelas";
+import { useEffect, useRef, useState } from "react"
+import mapboxgl, { Marker } from "mapbox-gl"
+import "mapbox-gl/dist/mapbox-gl.css"
+import { obtenerParcelas } from "../data/ObtenerParcelas"
 
 // Interfaces
 interface Sensor {
-    id: number;
-    humedad: number;
-    temperatura: number;
-    lluvia?: number;
-    sol?: number;
+    id: number
+    humedad: number
+    temperatura: number
+    lluvia?: number
+    sol?: number
 }
 
 interface Parcela {
-    id: string;
-    nombre: string;
-    responsable: string;
-    ubicacion: string;
-    tipo_cultivo: string;
-    ultimo_riego: string;
-    longitud: number;
-    latitud: number;
-    sensores: Sensor[];
-    activa: boolean;
+    id: string
+    nombre: string
+    responsable: string
+    ubicacion: string
+    tipo_cultivo: string
+    ultimo_riego: string
+    longitud: number
+    latitud: number
+    sensores: Sensor[]
+    activa: boolean
 }
 
-mapboxgl.accessToken =
-    "pk.eyJ1IjoiZ2FlbGZkeiIsImEiOiJjbTJjZXZxd2YweXNvMm1weTNvcDdjNG40In0.2POiq_70F9nHfajnXPPFSQ";
+mapboxgl.accessToken = "pk.eyJ1IjoiZ2FlbGZkeiIsImEiOiJjbTJjZXZxd2YweXNvMm1weTNvcDdjNG40In0.2POiq_70F9nHfajnXPPFSQ"
 
 function ParcelasUbicaciones() {
-    const mapContainerRef = useRef<HTMLDivElement>(null);
-    const mapRef = useRef<mapboxgl.Map | null>(null);
-    const [parcelasActivas, setParcelasActivas] = useState<Parcela[]>([]);
-    const [parcelasInactivas, setParcelasInactivas] = useState<Parcela[]>([]);
+    const mapContainerRef = useRef<HTMLDivElement>(null)
+    const mapRef = useRef<mapboxgl.Map | null>(null)
+    const [parcelasActivas, setParcelasActivas] = useState<Parcela[]>([])
+    const [parcelasInactivas, setParcelasInactivas] = useState<Parcela[]>([])
 
     // Obtener parcelas
     useEffect(() => {
         async function fetchParcelas() {
-            const data = await obtenerParcelas();
+            const data = await obtenerParcelas()
             if (data) {
-                const activas = data.filter((p: Parcela) => p.activa);
-                const inactivas = data.filter((p: Parcela) => !p.activa);
-                setParcelasActivas(activas);
-                setParcelasInactivas(inactivas);
+                const activas = data.filter((p: Parcela) => p.activa)
+                const inactivas = data.filter((p: Parcela) => !p.activa)
+                setParcelasActivas(activas)
+                setParcelasInactivas(inactivas)
             }
         }
 
-        fetchParcelas();
-        const interval = setInterval(fetchParcelas, 60000);
-        return () => clearInterval(interval);
-    }, []);
+        fetchParcelas()
+        const interval = setInterval(fetchParcelas, 60000)
+        return () => clearInterval(interval)
+    }, [])
 
     // Crear mapa con markers
     useEffect(() => {
-        if (!mapContainerRef.current || parcelasActivas.length === 0) return;
+        if (!mapContainerRef.current || parcelasActivas.length === 0) return
 
         if (!mapRef.current) {
             mapRef.current = new mapboxgl.Map({
@@ -61,11 +60,11 @@ function ParcelasUbicaciones() {
                 style: "mapbox://styles/mapbox/streets-v12",
                 center: [-86.87333776892409, 21.062168954535487],
                 zoom: 12,
-            });
+            })
         }
 
-        const map = mapRef.current;
-        const markers: Marker[] = [];
+        const map = mapRef.current
+        const markers: Marker[] = []
 
         parcelasActivas.forEach((parcela) => {
             if (parcela.latitud && parcela.longitud) {
@@ -86,31 +85,31 @@ function ParcelasUbicaciones() {
                             `).join("")}
                         `)
                     )
-                    .addTo(map);
+                    .addTo(map)
 
-                markers.push(marker);
+                markers.push(marker)
             }
-        });
+        })
 
         return () => {
-            markers.forEach(marker => marker.remove());
-        };
-    }, [parcelasActivas]);
+            markers.forEach(marker => marker.remove())
+        }
+    }, [parcelasActivas])
 
     // Destruir mapa si se desmonta el componente
     useEffect(() => {
         return () => {
             if (mapRef.current) {
-                mapRef.current.remove();
-                mapRef.current = null;
+                mapRef.current.remove()
+                mapRef.current = null
             }
-        };
-    }, []);
+        }
+    }, [])
 
     return (
         <div className="p-4">
             {/* Título */}
-            <h1 className="text-3xl font-bold mb-4">Parcelas activas</h1>
+            <h1 className="text-3xl text-white font-bold mb-4">Parcelas activas 🗺</h1>
 
             {/* Grid de parcelas activas */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -143,7 +142,7 @@ function ParcelasUbicaciones() {
             {/* Parcelas eliminadas */}
             {parcelasInactivas.length > 0 && (
                 <div className="mt-10">
-                    <h2 className="text-3xl font-bold mb-4">Parcelas eliminadas</h2>
+                    <h2 className="text-3xl font-bold mb-4 text-white">Parcelas eliminadas 🗺</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {parcelasInactivas.map((parcela) => (
                             <div key={parcela.id} className="p-4 bg-gray-100 rounded-md shadow-inner">
@@ -170,7 +169,7 @@ function ParcelasUbicaciones() {
                 </div>
             )}
         </div>
-    );
+    )
 }
 
-export default ParcelasUbicaciones;
+export default ParcelasUbicaciones
