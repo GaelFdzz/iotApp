@@ -42,8 +42,6 @@ export default function Login() {
                         Iniciar sesión
                     </button>
 
-                    <p className="flex justify-center">--------- ó -----------</p>
-
                     <span className="flex gap-1">
                         <p>¿No tienes una cuenta? </p>
                         <Link to="/register" className="text-blue-500 underline">
