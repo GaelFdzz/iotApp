@@ -34,7 +34,7 @@ export default function Register() {
                 <input
                     className="w-full mb-2 p-2 border rounded bg-[#C1C9D4]"
                     type="email"
-                    placeholder="Correo electrónico"
+                    placeholder="example@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                 />

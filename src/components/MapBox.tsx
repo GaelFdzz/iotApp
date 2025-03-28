@@ -73,8 +73,8 @@ function MapBox() {
               <p><strong>Último riego:</strong> ${parcela.ultimo_riego}</p>
               <p><strong>Humedad:</strong> ${sensor?.humedad !== undefined ? `${sensor.humedad}%` : "N/A"}</p>
               <p><strong>Temperatura:</strong> ${sensor?.temperatura !== undefined ? `${sensor.temperatura}°C` : "N/A"}</p>
-              <p><strong>Lluvia:</strong> ${sensor?.lluvia !== undefined ? `${sensor.lluvia} ` : "N/A"}</p>
-              <p><strong>Sol:</strong> ${sensor?.sol !== undefined ? `${sensor.sol} ` : "N/A"}</p>
+              <p><strong>Lluvia:</strong> ${sensor?.lluvia !== undefined ? `${sensor.lluvia} mm` : "N/A"}</p>
+              <p><strong>Sol:</strong> ${sensor?.sol !== undefined ? `${sensor.sol} %` : "N/A"}</p>
             `
 
             // Añadir el marcador con popup
