@@ -52,7 +52,7 @@ function MapBox() {
     if (!mapRef.current) {
       mapRef.current = new mapboxgl.Map({
         container: mapContainerRef.current,
-        style: "mapbox://styles/mapbox/streets-v12",
+        style: "mapbox://styles/mapbox/dark-v11",
         center: [-86.87333776892409, 21.062168954535487],
         zoom: 12,
       })

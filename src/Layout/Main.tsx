@@ -150,7 +150,7 @@ function Main() {
             {
                 label: "Intensidad del sol (%)",
                 data: historico.sol,
-                backgroundColor: "#FFD700",
+                backgroundColor: "#FFC701",
             },
         ],
     }
@@ -182,11 +182,11 @@ function Main() {
                     "rgba(255, 99, 132, 0.2)",
                     "rgba(30, 144, 255, 0.2)",
                     "rgba(138, 43, 226, 0.2)",
-                    "rgba(255, 215, 0, 0.2)",
+                    "rgba(255, 215, 0, 0.4)",
                 ],
                 borderColor: [
                     "rgba(255, 99, 132, 1)",
-                    "rgba(30, 144, 255, 1)",
+                    "rgba(30, 14, 255, 1)",
                     "rgba(138, 43, 226, 1)",
                     "rgba(255, 215, 0, 1)",
                 ],
@@ -205,37 +205,37 @@ function Main() {
     }
 
     return (
-        <div className="h-full flex flex-wrap gap-10 p-4 bg-[#151321]">
+        <div className="h-full flex flex-wrap gap-10 p-4 overflow-auto">
             {/* Mapa de Mapbox */}
-            <div className="w-[500px] h-full flex flex-col bg-white p-4 rounded-md overflow-hidden">
+            <div className="w-[500px] h-full flex flex-col bg-[#D9D9D9] p-4 rounded-md">
                 <h1 className="text-2xl font-bold mb-2">Mapa de ubicaciones de las parcelas 📍</h1>
                 <MapBox />
             </div>
 
             {/* Métricas de sensores */}
-            <div className="grid grid-cols-2 gap-6 w-auto h-fit">
-                <div className="flex flex-col justify-center items-center bg-white w-[280px] h-[120px] rounded-md shadow-md text-1xl">
+            <div className="grid grid-cols-2 gap-6 w-auto h-fit scroll-hide">
+                <div className="flex flex-col justify-center items-center bg-[#D9D9D9] w-[280px] h-[120px] rounded-md shadow-md text-1xl">
                     <div className="flex">
                         <h1 className="font-bold">Temperatura</h1>
                         <DeviceThermostatIcon sx={{ fontSize: 25 }} />
                     </div>
                     <p className="text-gray-700">{sensores.temperatura}°C</p>
                 </div>
-                <div className="flex flex-col justify-center items-center bg-white w-[280px] h-[120px] rounded-md shadow-md text-1xl">
+                <div className="flex flex-col justify-center items-center bg-[#D9D9D9] w-[280px] h-[120px] rounded-md shadow-md text-1xl">
                     <div className="flex gap-2">
                         <h1 className="font-bold">Humedad</h1>
                         <WaterDropIcon />
                     </div>
                     <p className="text-gray-700">{sensores.humedad}%</p>
                 </div>
-                <div className="flex flex-col justify-center items-center bg-white w-[280px] h-[120px] rounded-md shadow-md text-1xl">
+                <div className="flex flex-col justify-center items-center bg-[#D9D9D9] w-[280px] h-[120px] rounded-md shadow-md text-1xl">
                     <div className="flex gap-2">
                         <h1 className="font-bold">Clima</h1>
                         <CloudIcon />
                     </div>
                     <p className="text-gray-700">{sensores.lluvia === 0 ? "Soleado" : "Lluvia"}</p>
                 </div>
-                <div className="flex flex-col justify-center items-center bg-white w-[280px] h-[120px] rounded-md shadow-md text-1xl">
+                <div className="flex flex-col justify-center items-center bg-[#D9D9D9] w-[280px] h-[120px] rounded-md shadow-md text-1xl">
                     <div className="flex gap-2">
                         <h1 className="font-bold">Intensidad del sol</h1>
                         <WarningAmberIcon />
@@ -245,20 +245,20 @@ function Main() {
             </div>
 
             {/* Gráficos */}
-            <div className="flex flex-col">
+            <div className="flex flex-col bg-[#151321]">
                 <h1 className="text-3xl font-bold text-white">Gráficos historicos de los terrenos</h1>
                 <p className="text-white">Historico de los ultimos 50 registros de los sensores</p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full justify-between">
-                <div className="bg-white p-4 rounded-md shadow-md col-span-1 md:col-span-1 mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full justify-between scroll-hide">
+                <div className="bg-[#D9D9D9] p-4 rounded-md shadow-md col-span-1 md:col-span-1 mb-4">
                     <h2 className="flex text-xl font-semibold mb-4 justify-center">Temperatura y Humedad</h2>
                     <Line data={lineChartData} height={400} />
                 </div>
-                <div className="bg-white p-4 rounded-md shadow-md col-span-1 md:col-span-1 mb-4">
+                <div className="bg-[#D9D9D9] p-4 rounded-md shadow-md col-span-1 md:col-span-1 mb-4">
                     <h2 className="flex text-xl font-semibold mb-4 justify-center">Lluvia y Sol</h2>
                     <Bar data={barChartData} height={400} />
                 </div>
-                <div className="bg-white p-4 rounded-md shadow-md col-span-1 md:col-span-1 mb-4">
+                <div className="bg-[#D9D9D9] p-4 rounded-md shadow-md col-span-1 md:col-span-1 mb-4">
                     <div>
                         <h2 className="flex text-xl font-semibold mb-4 justify-center">Todos los sensores</h2>
                         <Doughnut data={doughnutChartData} height={400} />
