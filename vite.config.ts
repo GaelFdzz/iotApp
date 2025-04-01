@@ -7,9 +7,9 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://moriahmkt.com/iotapp', // URL base del servidor
+        target: 'https://moriahmkt.com/iotapp',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''), // quita /api del path final
+        rewrite: (path) => path.replace(/^\/api/, ''),
       },
     },
   },

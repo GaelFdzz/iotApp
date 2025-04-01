@@ -5,7 +5,6 @@ export async function guardarDatosAPI() {
     console.log("🚀 Ejecutando guardarDatosAPI")
 
     try {
-        // Obtener datos de la API externa
         const response = await axios.get("api/updated/")
         const data = response.data
 
@@ -16,7 +15,6 @@ export async function guardarDatosAPI() {
             return
         }
 
-        // Guardar sensores globales si cambian
         const { data: lastSensorGlobal, error: errorGlobal } = await supabase
             .from("sensores_globales")
             .select("*")
@@ -54,7 +52,6 @@ export async function guardarDatosAPI() {
             }
         }
 
-        // Verificar y actualizar parcelas inactivas
         const { data: parcelasDB, error: errorParcelasDB } = await supabase.from("parcelas").select("id")
 
         if (errorParcelasDB) {
@@ -79,10 +76,9 @@ export async function guardarDatosAPI() {
                 }
             }
         }
-
-        // Insertar o actualizar parcelas y sensores
+      
         for (const parcela of data.parcelas) {
-            // Validar sensores
+        
             if (
                 parcela.sensor &&
                 parcela.sensor.temperatura !== undefined &&
@@ -90,7 +86,6 @@ export async function guardarDatosAPI() {
                 parcela.sensor.lluvia !== undefined &&
                 parcela.sensor.sol !== undefined
             ) {
-                // Insertar o actualizar parcela
                 const { error: upsertError } = await supabase.from("parcelas").upsert([{
                     id: parcela.id,
                     nombre: parcela.nombre,
@@ -110,7 +105,6 @@ export async function guardarDatosAPI() {
                     console.log(`✅ Parcela guardada: ${parcela.nombre} (${parcela.id})`)
                 }
 
-                // Insertar sensores de la parcela
                 const { error: insertSensorError } = await supabase.from("sensores_parcelas").insert([{
                     parcela_id: parcela.id,
                     temperatura: parcela.sensor.temperatura,

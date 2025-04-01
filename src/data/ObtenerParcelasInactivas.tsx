@@ -1,18 +1,18 @@
 import { supabase } from "./supabaseConfig"
 
-export async function obtenerParcelas() {
+export async function obtenerParcelasInactivas() {
     try {
         const { data: parcelas, error } = await supabase
             .from("parcelas")
             .select("*")
-            .eq("activa", true)
+            .eq("activa", false)
 
         if (error) {
-            console.error("Error al obtener parcelas:", error)
+            console.error("Error al obtener parcelas inactivas:", error)
             return []
         }
 
-        console.log("📌 Parcelas obtenidas de Supabase:", parcelas.length)
+        console.log("📌 Parcelas inactivas obtenidas:", parcelas.length)
 
         const parcelasConSensores = await Promise.all(parcelas.map(async parcela => {
             const { data: sensores, error: errorSensores } = await supabase
@@ -27,10 +27,10 @@ export async function obtenerParcelas() {
             return { ...parcela, sensores: sensores ?? [] }
         }))
 
-        console.log("✅ Parcelas con sensores procesadas:", parcelasConSensores.length)
+        console.log("✅ Parcelas inactivas con sensores procesadas:", parcelasConSensores.length)
         return parcelasConSensores
     } catch (error) {
         console.error("Error inesperado:", error)
         return []
     }
-}  
+}

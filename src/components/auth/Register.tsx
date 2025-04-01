@@ -11,30 +11,49 @@ export default function Register() {
 
     const handleRegister = async () => {
         setLoading(true)
-        setError(null)       // 👈 Limpiar errores anteriores
-        setMessage(null)     // 👈 Limpiar mensajes anteriores
+        setError(null)
+        setMessage(null)
+    
+        const { data: existingUser, error: fetchError } = await supabase.rpc("check_email_exists", { email_input: email })
+    
+        if (fetchError) {
+            console.error("Error al verificar usuario:", fetchError)
+            setError("Error al verificar el usuario.")
+            setLoading(false)
+            return
+        }
+    
+        if (existingUser) {
+            setError("Este correo ya está registrado. Intenta iniciar sesión.")
+            setLoading(false)
+            return
+        }
 
-        const { error } = await supabase.auth.signUp({ email, password })
-
+        const { error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: { emailRedirectTo: "http://localhost:5173/login" }
+        })
+    
         setLoading(false)
-
+    
         if (error) {
             setError(error.message)
         } else {
             setMessage("Registro exitoso. Revisa tu correo para confirmar.")
         }
     }
-
+    
     return (
-        <div className="bg-[#031C8C] min-h-screen flex items-center justify-center">
-            <div className="max-w-md mx-auto mt-10 p-6 bg-[#151321] rounded-2xl shadow">
+        <div className="bg-[#151321] min-h-screen flex items-center justify-center">
+            <div className="max-w-md mx-auto mt-10 p-6 rounded-2xl">
                 <h2 className="flex justify-center text-3xl text-[#C1C9D4] font-bold mb-4">Registro de nuevos usuarios</h2>
 
                 <label className="text-[#C1C9D4]">Correo electrónico</label>
                 <input
                     className="w-full mb-2 p-2 border rounded bg-[#C1C9D4]"
                     type="email"
-                    placeholder="example@example.com"
+                    placeholder="correo@dominio.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                 />
@@ -43,7 +62,7 @@ export default function Register() {
                 <input
                     className="w-full mb-4 p-2 border rounded bg-[#C1C9D4]"
                     type="password"
-                    placeholder="Contraseña"
+                    placeholder="Longitud mínimo de 6 caracteres"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                 />

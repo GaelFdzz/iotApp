@@ -18,8 +18,8 @@ export default function Login() {
     }
 
     return (
-        <div className="bg-[#031C8C] min-h-screen flex items-center justify-center">
-            <div className="max-w-md mx-auto mt-10 p-6 bg-[#151321] rounded-2xl shadow">
+        <div className="bg-[#151321] min-h-screen flex items-center justify-center">
+            <div className="max-w-md mx-auto mt-10 p-6 rounded-2xl">
                 <h1 className="flex justify-center text-3xl text-[#C1C9D4] font-bold mb-4">Iniciar sesión</h1>
                 <p className="text-2xl mb-4 text-[#C1C9D4] justify-self-center">Bienvenido! 🌳</p>
 

@@ -11,7 +11,6 @@ import { Chart as ChartJS, CategoryScale, LinearScale, RadialLinearScale, PointE
 import { guardarDatosAPI } from "../data/GuardarDatosAPI"
 import CircularProgress from "@mui/material/CircularProgress"
 
-// Registrar los componentes necesarios para los gráficos
 ChartJS.register(
     CategoryScale,
     LinearScale,
@@ -34,7 +33,6 @@ function Main() {
         sol: 0,
     })
 
-    // Define los tipos de datos para el histórico
     const [historico, setHistorico] = useState({
         temperaturas: [] as number[],
         humedades: [] as number[],
@@ -216,31 +214,31 @@ function Main() {
             <div className="grid grid-cols-2 gap-6 w-auto h-fit scroll-hide">
                 <div className="flex flex-col justify-center items-center bg-[#D9D9D9] w-[280px] h-[120px] rounded-md shadow-md text-1xl">
                     <div className="flex">
-                        <h1 className="font-bold">Temperatura</h1>
-                        <DeviceThermostatIcon sx={{ fontSize: 25 }} />
+                        <h1 className="font-bold text-[20px]">Temperatura</h1>
+                        <DeviceThermostatIcon sx={{ fontSize: 28 }} />
                     </div>
                     <p className="text-gray-700">{sensores.temperatura}°C</p>
                 </div>
                 <div className="flex flex-col justify-center items-center bg-[#D9D9D9] w-[280px] h-[120px] rounded-md shadow-md text-1xl">
                     <div className="flex gap-2">
-                        <h1 className="font-bold">Humedad</h1>
+                        <h1 className="font-bold text-[20px]">Humedad</h1>
                         <WaterDropIcon />
                     </div>
-                    <p className="text-gray-700">{sensores.humedad}%</p>
+                    <p className="text-gray-700 text-[16px]">{sensores.humedad}%</p>
                 </div>
                 <div className="flex flex-col justify-center items-center bg-[#D9D9D9] w-[280px] h-[120px] rounded-md shadow-md text-1xl">
                     <div className="flex gap-2">
-                        <h1 className="font-bold">Clima</h1>
+                        <h1 className="font-bold text-[20px]">Clima</h1>
                         <CloudIcon />
                     </div>
-                    <p className="text-gray-700">{sensores.lluvia === 0 ? "Soleado" : "Lluvia"}</p>
+                    <p className="text-gray-700 text-[16px]">{sensores.lluvia === 0 ? "Soleado" : "Lluvia"}</p>
                 </div>
                 <div className="flex flex-col justify-center items-center bg-[#D9D9D9] w-[280px] h-[120px] rounded-md shadow-md text-1xl">
                     <div className="flex gap-2">
-                        <h1 className="font-bold">Intensidad del sol</h1>
+                        <h1 className="font-bold text-[20px]">Intensidad del sol</h1>
                         <WarningAmberIcon />
                     </div>
-                    <p className="text-gray-700">{sensores.sol}%</p>
+                    <p className="text-gray-700 text-[16px]">{sensores.sol}%</p>
                 </div>
             </div>
 
