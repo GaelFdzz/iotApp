@@ -2,6 +2,7 @@ import { Bar, Doughnut, Line } from "react-chartjs-2"
 import { Chart as ChartJS, CategoryScale, LinearScale, RadialLinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend } from "chart.js"
 import { useEffect, useState } from "react"
 import { obtenerHistoricoSensores } from "../data/ObtenerHistoricoSensores"
+import { CircularProgress } from "@mui/material"
 
 ChartJS.register(
     CategoryScale,
@@ -65,8 +66,6 @@ function Graficos() {
         fetchData()
         const interval = setInterval(fetchData, 60000)
 
-        guardarDatosAPI()
-
         return () => clearInterval(interval)
     }, [])
 
@@ -127,7 +126,7 @@ function Graficos() {
     const promedioSol = calcularPromedio(historico.sol)
 
     const doughnutChartData = {
-        labels: ["Temperatura", "Humedad", "Lluvia", "Sol"],
+        labels: ["Temperatura (°C)", "Humedad (%)", "Lluvia (mm)", "Intensidad del sol (%)"],
         datasets: [
             {
                 label: "Promedio histórico",
@@ -154,14 +153,23 @@ function Graficos() {
         ],
     }
 
+    if (loading) {
+        return (
+            <div className="flex mt-50 justify-center items-center text-white">
+                <CircularProgress size={80} color="inherit" />
+                <p className="ml-4 text-xl">Cargando datos de sensores...</p>
+            </div>
+        )
+    }
+
     return (
-        <>
+        <div className="p-4">
             {/* Gráficos */}
             <div className="flex flex-col bg-[#151321]">
-                <h1 className="text-3xl font-bold text-white">Gráficos historicos de los terrenos</h1>
-                <p className="text-white">Historico de los ultimos 50 registros de los sensores</p>
+                <h1 className="text-3xl font-bold text-white pb-4">Gráficos historicos de los terrenos</h1>
+                <p className="text-white pb-4">Historico de los ultimos 50 registros de los sensores</p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full justify-between scroll-hide">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full justify-between">
                 <div className="bg-[#D9D9D9] p-4 rounded-md shadow-md col-span-1 md:col-span-1 mb-4">
                     <h2 className="flex text-xl font-semibold mb-4 justify-center">Temperatura y Humedad</h2>
                     <Line data={lineChartData} height={400} />
@@ -178,7 +186,7 @@ function Graficos() {
                     </div>
                 </div>
             </div>
-        </>
+        </div>
     )
 }
 

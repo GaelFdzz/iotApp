@@ -5,11 +5,8 @@ import CloudIcon from "@mui/icons-material/Cloud"
 import WaterDropIcon from "@mui/icons-material/WaterDrop"
 import WarningAmberIcon from "@mui/icons-material/WarningAmber"
 import axios from "axios"
-import { obtenerHistoricoSensores } from "../data/ObtenerHistoricoSensores"
 import { guardarDatosAPI } from "../data/GuardarDatosAPI"
 import CircularProgress from "@mui/material/CircularProgress"
-
-
 
 function Main() {
     const [loading, setLoading] = useState(true)
@@ -24,63 +21,21 @@ function Main() {
         async function fetchData() {
             console.log("⏳ Ejecutando fetchData...")
             setLoading(true)
-            // await new Promise((resolve) => setTimeout(resolve, 2000)) // Espera 2 segundos
+
             try {
-                // Obtener histórico de sensores
-                const historicoData = await obtenerHistoricoSensores()
-                console.log("📊 Histórico de sensores recibido:", historicoData)
-
-                if (historicoData.length > 0) {
-                    const temperaturas: number[] = []
-                    const humedades: number[] = []
-                    const lluvias: number[] = []
-                    const sol: number[] = []
-                    const timestamps: string[] = []
-
-                    historicoData.forEach((registro: any) => {
-                        temperaturas.push(registro.temperatura)
-                        humedades.push(registro.humedad)
-                        lluvias.push(registro.lluvia)
-                        sol.push(registro.sol)
-
-                        const fecha = new Date(registro.fecha_registro)
-                        const fechaFormateada = `${fecha.getDate()}/${fecha.getMonth() + 1}/${fecha.getFullYear()}`
-                        timestamps.push(fechaFormateada)
-                    })
-
-                    setHistorico({
-                        temperaturas,
-                        humedades,
-                        lluvias,
-                        sol,
-                        timestamps,
-                    })
-                }
-
                 // Obtener datos de la API
-                const { data } = await axios.get("api/updated/")
+                const { data } = await axios.get("/api/updated/")
                 console.log("📡 Datos de la API recibidos:", data)
 
                 if (data) {
                     setSensores(data.sensores)
                     console.log("🌡 Sensores actualizados:", data.sensores)
-
-                    setHistorico((prev) => {
-                        const fechaActual = new Date()
-                        const fechaFormateada = `${fechaActual.getDate()}/${fechaActual.getMonth() + 1}/${fechaActual.getFullYear()}`
-
-                        return {
-                            ...prev,
-                            temperaturas: [...prev.temperaturas, data.sensores.temperatura],
-                            humedades: [...prev.humedades, data.sensores.humedad],
-                            lluvias: [...prev.lluvias, data.sensores.lluvia],
-                            sol: [...prev.sol, data.sensores.sol],
-                            timestamps: [...prev.timestamps, fechaFormateada],
-                        }
-                    })
                 } else {
                     console.warn("⚠️ No se recibieron datos válidos de la API.")
                 }
+
+                // Guardar datos en la base de datos
+                await guardarDatosAPI()
             } catch (error) {
                 console.error("❌ Error en fetchData:", error)
             } finally {
@@ -91,12 +46,8 @@ function Main() {
         fetchData()
         const interval = setInterval(fetchData, 60000)
 
-        guardarDatosAPI()
-
         return () => clearInterval(interval)
     }, [])
-
-
 
     if (loading) {
         return (
@@ -108,15 +59,14 @@ function Main() {
     }
 
     return (
-        <>
-            <h1 className=" text-white m-4 text-4xl font-bold">Dashboard</h1>
+        <div className="contain-content">
+            <h1 className="text-3xl font-bold text-white m-4 mb-0">Datos generales de las parcelas</h1>
             <div className="h-full flex flex-wrap gap-10 p-4 overflow-auto">
                 {/* Mapa de Mapbox */}
                 <div className="w-[500px] h-[400px] flex flex-col bg-[#D9D9D9] p-4 rounded-md">
                     <h1 className="text-2xl font-bold mb-2">Mapa de ubicaciones de las parcelas</h1>
                     <MapBox />
                 </div>
-
                 {/* Métricas de sensores */}
                 <div className="grid grid-cols-2 gap-6 w-auto h-fit scroll-hide">
                     <div className="flex flex-col justify-center items-center bg-[#D9D9D9] w-[270px] h-[120px] rounded-md shadow-md text-1xl">
@@ -149,7 +99,7 @@ function Main() {
                     </div>
                 </div>
             </div>
-        </>
+        </div>
     )
 }
 

@@ -53,34 +53,54 @@ function ParcelasInactivas() {
 
     return (
         <div className="p-4">
-            <h2 className="text-3xl font-bold mb text-white">Parcelas eliminadas <span></span></h2>
-            <p className="text-white mb-4">Lista de parcelas que se encuentran en el estado de no-activa/eliminada.</p>
+            <h2 className="text-3xl font-bold text-white mb-4">Parcelas eliminadas</h2>
+            <p className="text-white mb-4">Lista de parcelas que se encuentran en estado no activo/eliminado.</p>
+
             {parcelasInactivas.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {parcelasInactivas.map((parcela) => (
-                        <div key={parcela.id} className="p-4 bg-[#D9D9D9] rounded-md shadow-inner">
-                            <h2 className="text-xl font-semibold">{parcela.nombre}</h2>
-                            <p><strong>Responsable:</strong> {parcela.responsable}</p>
-                            <p><strong>Ubicación:</strong> {parcela.ubicacion}</p>
-                            <p><strong>Tipo de cultivo:</strong> {parcela.tipo_cultivo}</p>
-                            <p><strong>Último riego:</strong> {parcela.ultimo_riego}</p>
-                            {parcela.sensores.length > 0 ? (
-                                parcela.sensores.map((sensor, index) => (
-                                    <div key={index}>
-                                        <p><strong>Humedad:</strong> {sensor.humedad}%</p>
-                                        <p><strong>Temperatura:</strong> {sensor.temperatura}°C</p>
-                                        {sensor.lluvia !== undefined && <p><strong>Lluvia:</strong> {sensor.lluvia} mm</p>}
-                                        {sensor.sol !== undefined && <p><strong>Sol:</strong> {sensor.sol}%</p>}
-                                    </div>
-                                ))
-                            ) : (
-                                <p><strong>Sin sensores disponibles.</strong></p>
-                            )}
-                        </div>
-                    ))}
+                <div className="overflow-hidden rounded-lg border border-gray-700">
+                    <table className="w-full border-collapse text-white">
+                        <thead className="bg-gray-800 rounded-t-lg">
+                            <tr>
+                                <th className="border border-gray-600 px-4 py-2">Nombre</th>
+                                <th className="border border-gray-600 px-4 py-2">Responsable</th>
+                                <th className="border border-gray-600 px-4 py-2">Ubicación</th>
+                                <th className="border border-gray-600 px-4 py-2">Tipo de Cultivo</th>
+                                <th className="border border-gray-600 px-4 py-2">Último Riego</th>
+                                <th className="border border-gray-600 px-4 py-2">Sensores <br /> <span className="text-[10px] text-gray-500">(Temperatura / Humedad / Lluvia / Intensidad del sol)</span></th>
+                            </tr>
+                        </thead>
+                        <tbody className="rounded-b-lg">
+                            {parcelasInactivas.map((parcela) => (
+                                <tr key={parcela.id} className="bg-gray-700 transition delay-0 duration-300 hover:bg-[#090B52] hover:-translate-y-0.5 hover:scale-101">
+                                    <td className="border border-gray-600 px-4 py-2">{parcela.nombre}</td>
+                                    <td className="border border-gray-600 px-4 py-2">{parcela.responsable}</td>
+                                    <td className="border border-gray-600 px-4 py-2">{parcela.ubicacion}</td>
+                                    <td className="border border-gray-600 px-4 py-2">{parcela.tipo_cultivo}</td>
+                                    <td className="border border-gray-600 px-4 py-2">{parcela.ultimo_riego}</td>
+                                    <td className="border border-gray-600 px-4 py-2">
+                                        {parcela.sensores.length > 0 ? (
+                                            <ul>
+                                                {parcela.sensores.map((sensor, index) => (
+                                                    <li key={index} className="text-sm">
+                                                        🌡 {sensor.temperatura}°C | 💧 {sensor.humedad}%
+                                                        {sensor.lluvia !== undefined && ` | 🌧 ${sensor.lluvia} mm`}
+                                                        {sensor.sol !== undefined && ` | ☀️ ${sensor.sol}%`}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        ) : (
+                                            "Sin sensores"
+                                        )}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             ) : (
-                <p className="text-white text-lg place-self-center rounded-[7px] p-4 border-1 border-red-700 bg-red-400/10">No hay parcelas inactivas en este momento.</p>
+                <p className="text-white text-lg place-self-center rounded-[7px] p-4 border border-red-700 bg-red-400/10">
+                    No hay parcelas inactivas en este momento.
+                </p>
             )}
         </div>
     )

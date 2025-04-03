@@ -92,8 +92,17 @@ function MapBox() {
     }, 500)
   }, [parcelas])
 
-
-  return <div ref={mapContainerRef} className="absolute w-full h-full" />
+  return (
+    <>
+      <div ref={mapContainerRef} className="absolute w-full h-full">
+        {parcelas.length === 0 && (
+            <div className="contain-content absolute flex bg-white text-center z-1 bg-clip-text items-center justify-center w-full h-full">
+            <p className="text-white p-3 rounded-[7px] bg-red-500/30 border border-red-600">No hay parcelas activas en este momento.</p>
+          </div>
+        )}
+      </div>
+    </>
+  )
 }
 
 export default MapBox
