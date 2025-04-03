@@ -53,8 +53,8 @@ function ParcelasInactivas() {
 
     return (
         <div className="p-4">
-            <h2 className="text-3xl font-bold mb text-white">Parcelas eliminadas ❌</h2>
-            <p className="text-white mb-4">Lista de parcelas que no se encuentran en el estado de no-activa/eliminada.</p>
+            <h2 className="text-3xl font-bold mb text-white">Parcelas eliminadas <span></span></h2>
+            <p className="text-white mb-4">Lista de parcelas que se encuentran en el estado de no-activa/eliminada.</p>
             {parcelasInactivas.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {parcelasInactivas.map((parcela) => (
@@ -80,7 +80,7 @@ function ParcelasInactivas() {
                     ))}
                 </div>
             ) : (
-                <p className="text-white text-lg">No hay parcelas inactivas en este momento.</p>
+                <p className="text-white text-lg place-self-center rounded-[7px] p-4 border-1 border-red-700 bg-red-400/10">No hay parcelas inactivas en este momento.</p>
             )}
         </div>
     )
